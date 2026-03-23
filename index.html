@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Secure Access Terminal</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Intro overlay -->
+  <div id="intro">
+    <div class="intro-bg" id="bg2"></div>
+    <div class="intro-bg" id="bg3"></div>
+  </div>
+
+  <!-- Main login content (hidden initially) -->
+  <div id="main-content" style="display:none;">
+    <div class="banner">[*] Secure Access Terminal</div>
+
+    <h1 id="main-heading" class="main-heading">⚡ Welcome to the Digital Frontier ⚡</h1>
+    <p id="quote" class="quote">"Control can sometimes be an illusion. But sometimes you need illusion to gain control."</p>
+
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username"><br>
+      <input type="password" id="password" placeholder="Password"><br>
+      <button type="submit">Login</button>
+    </form>
+
+    <div id="message"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Control Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <div class="dashboard-container">
+    <div class="top-bar">
+      <h1 class="dashboard-heading flicker">🖥️ Control Dashboard</h1>
+      <div class="top-buttons">
+        <a href="logs.html" class="logs-button">View Logs</a>
+        <a href="http://127.0.0.1:8080/download_logs" class="logs-button">Download Logs</a>
+      </div>
+    </div>
+    <p class="dashboard-quote">"The future is controlled by those who command the code."</p>
+
+    <div class="dashboard-panels">
+      <div class="panel glass">
+        <h2>Connected Clients</h2>
+        <table class="clients-table">
+          <thead>
+            <tr><th>ID</th><th>IP Address</th><th>Status</th></tr>
+          </thead>
+          <tbody id="clients">
+            <tr><td>1</td><td>192.168.1.10</td><td><span class="status active">Active</span></td></tr>
+            <tr><td>2</td><td>192.168.1.15</td><td><span class="status idle">Idle</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel glass">
+        <h2>Command Console</h2>
+        <div class="console">
+          <input type="text" id="command" placeholder="Enter command...">
+          <span class="cursor">█</span>
+          <button onclick="sendCommand()">Execute</button>
+        </div>
+        <div id="logs" class="logs"></div>
+      </div>
+    </div>
+  </div>
+  <script src="dashboard.js"></script>
+</body>
+</html>

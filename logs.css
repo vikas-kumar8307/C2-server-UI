@@ -1,0 +1,58 @@
+body {
+  background: url("images/background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  font-family: Consolas, monospace;
+  color: lime;
+  margin: 0;
+  padding: 20px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: -1;
+}
+
+.logs-container {
+  max-width: 800px;
+  margin: auto;
+  text-align: center;
+}
+
+.logs-heading {
+  font-size: 32px;
+  color: #ff00ff;
+  text-shadow: 0 0 20px #ff00ff, 0 0 40px purple;
+}
+
+.logs-panel {
+  background-color: black;
+  border: 1px solid lime;
+  box-shadow: 0 0 15px lime;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: left;
+  margin-top: 20px;
+  height: 400px;
+  overflow-y: auto;
+}
+
+.back-button {
+  display: inline-block;
+  margin-top: 20px;
+  background-color: lime;
+  color: black;
+  font-weight: bold;
+  padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 0 10px lime;
+}
+
+.back-button:hover {
+  background-color: darkgreen;
+  color: white;
+}
