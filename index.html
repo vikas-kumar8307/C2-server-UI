@@ -2,32 +2,88 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Secure Access Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication - C2 Operations</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
-  <!-- Intro overlay -->
-  <div id="intro">
-    <div class="intro-bg" id="bg2"></div>
-    <div class="intro-bg" id="bg3"></div>
+  <div class="login-container">
+    <div class="login-box">
+      
+      <div class="login-header">
+        <i class="ph ph-shield-check shield-icon"></i>
+        <h1>ThreatOps Gateway</h1>
+        <p>Restricted Access Area</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        
+        <div class="input-group">
+          <label for="username">Operator ID</label>
+          <div class="input-wrapper">
+            <i class="ph ph-user"></i>
+            <input type="text" id="username" placeholder="e.g. admin" required autocomplete="off">
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="password">Passphrase</label>
+          <div class="input-wrapper">
+            <i class="ph ph-lock-key"></i>
+            <input type="password" id="password" placeholder="••••••••••••" required>
+          </div>
+        </div>
+
+        <div id="login-message" class="login-message" style="display: none;"></div>
+
+        <button type="submit" class="btn-login">Establish Session</button>
+      </form>
+
+      <div class="login-footer">
+        <p><i class="ph ph-warning-circle"></i> Unauthorized access is strictly prohibited and logged.</p>
+      </div>
+
+    </div>
   </div>
 
-  <!-- Main login content (hidden initially) -->
-  <div id="main-content" style="display:none;">
-    <div class="banner">[*] Secure Access Terminal</div>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      const usernameInput = document.getElementById("username").value.trim();
+      const passwordInput = document.getElementById("password").value.trim();
+      const messageDiv = document.getElementById("login-message");
+      const submitBtn = document.querySelector(".btn-login");
 
-    <h1 id="main-heading" class="main-heading">⚡ Welcome to the Digital Frontier ⚡</h1>
-    <p id="quote" class="quote">"Control can sometimes be an illusion. But sometimes you need illusion to gain control."</p>
+      // Reset message
+      messageDiv.style.display = "none";
+      messageDiv.className = "login-message";
 
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Username"><br>
-      <input type="password" id="password" placeholder="Password"><br>
-      <button type="submit">Login</button>
-    </form>
+      // Disable button briefly to show processing state
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Verifying...";
 
-    <div id="message"></div>
-  </div>
-
-  <script src="app.js"></script>
+      setTimeout(() => {
+        if (usernameInput === "admin" && passwordInput === "admin123") {
+          // Success state
+          messageDiv.textContent = "Authentication successful. Redirecting...";
+          messageDiv.classList.add("success");
+          messageDiv.style.display = "block";
+          
+          setTimeout(() => {
+            window.location.href = "dashboard.html";
+          }, 800);
+        } else {
+          // Error state
+          messageDiv.textContent = "Access Denied: Invalid Operator ID or Passphrase.";
+          messageDiv.classList.add("error");
+          messageDiv.style.display = "block";
+          submitBtn.disabled = false;
+          submitBtn.textContent = "Establish Session";
+        }
+      }, 500); // Simulate a slight network delay for realism
+    });
+  </script>
 </body>
 </html>
