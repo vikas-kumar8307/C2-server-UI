@@ -2,19 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>System Logs</title>
-  <link rel="stylesheet" href="logs.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Logs - ThreatOps</title>
+  <link rel="stylesheet" href="dashboard.css?v=2">
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    body { padding: 40px; overflow-y: auto; }
+    .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; }
+    .filter-input { flex-grow: 1; padding: 10px 15px; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 6px; outline: none;}
+    .filter-input:focus { border-color: var(--accent-blue); }
+    .log-table th { background-color: rgba(0,0,0,0.2); }
+    .type-login { color: var(--accent-blue); font-weight: bold; }
+    .type-command { color: var(--accent-orange); font-weight: bold; }
+    .type-connection { color: var(--accent-green); font-weight: bold; }
+  </style>
 </head>
 <body>
-  <div class="logs-container">
-    <h1 class="logs-heading">📜 System Logs</h1>
-    <div id="logs" class="logs-panel">
-      <p>[*] Initializing dashboard...</p>
-      <p>[+] New client connected: 192.168.1.20</p>
-      <p>[>] Executing: ping 192.168.1.10</p>
-      <p>[✓] Command 'ping 192.168.1.10' executed successfully.</p>
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <header class="top-bar">
+      <div>
+        <h1 class="dashboard-heading"><i class="ph ph-list-magnifying-glass"></i> System Audit Trail</h1>
+        <p class="dashboard-subtitle">Immutable log of operator actions and network events</p>
+      </div>
+      <div class="top-buttons">
+        <a href="dashboard.html" class="btn"><i class="ph ph-arrow-left"></i> Return to Command Center</a>
+        <button class="btn btn-primary" onclick="alert('Exporting logs to CSV...')"><i class="ph ph-download-simple"></i> Export CSV</button>
+      </div>
+    </header>
+
+    <div class="panel">
+      <div class="filter-bar">
+        <input type="text" id="searchLog" class="filter-input" placeholder="Search logs by IP, command, or operator..." onkeyup="filterLogs()">
+        <select id="typeFilter" class="filter-input" style="max-width: 200px;" onchange="filterLogs()">
+          <option value="ALL">All Events</option>
+          <option value="LOGIN">Logins</option>
+          <option value="COMMAND">Commands</option>
+          <option value="CONNECTION">Connections</option>
+        </select>
+      </div>
+
+      <div class="table-responsive">
+        <table class="clients-table log-table" id="logTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Event Type</th>
+              <th>Source IP</th>
+              <th>Operator / Target</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            </tbody>
+        </table>
+      </div>
     </div>
-    <a href="dashboard.html" class="back-button">⬅ Back to Dashboard</a>
   </div>
+
+  <script>
+    // Simulated Log Data for the GSoC Vercel Demo
+    const logs = [
+      { time: "2026-03-31 16:45:02", type: "COMMAND", ip: "192.168.1.10", user: "admin", details: "Executed: 'whoami /priv' on BCN-01" },
+      { time: "2026-03-31 16:42:15", type: "COMMAND", ip: "10.0.5.22", user: "admin", details: "Executed: 'ls -la /etc' on BCN-02" },
+      { time: "2026-03-31 15:30:00", type: "CONNECTION", ip: "10.0.5.22", user: "SYSTEM", details: "New beacon check-in (Linux ELF)" },
+      { time: "2026-03-31 15:10:44", type: "LOGIN", ip: "203.0.113.45", user: "admin", details: "Successful operator authentication" },
+      { time: "2026-03-31 14:05:12", type: "LOGIN", ip: "198.51.100.2", user: "UNKNOWN", details: "Failed login attempt (Invalid Passphrase)" },
+      { time: "2026-03-31 12:22:01", type: "CONNECTION", ip: "192.168.1.10", user: "SYSTEM", details: "New beacon check-in (Windows .exe)" }
+    ];
+
+    const tbody = document.querySelector("#logTable tbody");
+
+    function renderLogs(data) {
+      tbody.innerHTML = "";
+      data.forEach(log => {
+        let typeClass = "";
+        if (log.type === "LOGIN") typeClass = "type-login";
+        if (log.type === "COMMAND") typeClass = "type-command";
+        if (log.type === "CONNECTION") typeClass = "type-connection";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="mono" style="color: var(--text-muted);">${log.time}</td>
+          <td class="${typeClass}">[${log.type}]</td>
+          <td class="mono">${log.ip}</td>
+          <td>${log.user}</td>
+          <td class="mono">${log.details}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Function to handle the live search bar
+    function filterLogs() {
+      const searchTerm = document.getElementById("searchLog").value.toLowerCase();
+      const typeFilter = document.getElementById("typeFilter").value;
+
+      const filtered = logs.filter(log => {
+        const matchesSearch = log.ip.includes(searchTerm) || log.details.toLowerCase().includes(searchTerm) || log.user.toLowerCase().includes(searchTerm);
+        const matchesType = typeFilter === "ALL" || log.type === typeFilter;
+        return matchesSearch && matchesType;
+      });
+
+      renderLogs(filtered);
+    }
+
+    // Load logs when the page opens
+    renderLogs(logs);
+  </script>
 </body>
 </html>
